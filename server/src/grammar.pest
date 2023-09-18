@@ -1,0 +1,29 @@
+expression = _{ get_expression | set_expression | delete_expression}
+	get_expression = ${ "GET" ~ WHITESPACE* ~ (label | index) }
+	set_expression = ${ "SET" ~ WHITESPACE* ~ label ~ WHITESPACE* ~ "=" ~ WHITESPACE* ~ data}
+    delete_expression = ${ "DELETE" ~ WHITESPACE* ~ (label | index) }
+label = _{ index ~ ":" ~ doc }
+	index = @{ ASCII_ALPHANUMERIC* }
+    doc = @{ ASCII_ALPHANUMERIC* }
+data = { bool | number | string | json }
+json = _{ "JSON" ~ (object | array) }
+  	object = !{ "{" ~ "}" | "{" ~ pair ~ ("," ~ pair)* ~ "}" }
+   	pair = !{ string ~ ":" ~ value }
+    array = !{ "[" ~ "]" | "[" ~ value ~ ("," ~ value)* ~ "]" }
+    value = _{ object | array | string | number | bool | null }
+    null = { "null" }
+bool = @{ "true" | "false" }
+number = @{
+    "-"?
+    ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+    ~ ("." ~ ASCII_DIGIT*)?
+    ~ (^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+)?
+}
+string = ${ "\"" ~ inner ~ "\"" }
+inner = @{ char* }
+char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
