@@ -33,20 +33,21 @@ pub fn parse(manager: &mut Manager, expression: &str) -> Result<Value, Box<dyn E
             let index = manager.indices.get(&setter.doc.0).unwrap();
             match index.docs.get_key_value(&setter.doc.1) {
                 Some(doc) => {
-                    manager.update_doc(doc.0.clone(), doc.1.clone(), setter.data)?;
-                    Ok(json!({"index": &setter.doc.0, "id": &setter.doc.1}))
+                    manager.update_doc(setter.doc.0.clone(), doc.0.clone(), setter.data)?;
+                    Ok(json!({"index": &setter.doc.0, "doc": &setter.doc.1}))
                 },
                 None => {
                     manager.create_doc(setter.doc.0.clone(), setter.doc.1.clone(), setter.data)?;
-                    Ok(json!({"index": &setter.doc.0, "id": &setter.doc.1}))
+                    Ok(json!({"index": &setter.doc.0, "doc": &setter.doc.1}))
                 },
             }
         },
         Expression::Delete(label) => {
             match label {
                 Label::Index(index) => {
+                    let docs: Vec<String> = manager.indices.get(&index).unwrap().docs.keys().cloned().collect();
                     manager.delete_index(index.clone())?;
-                    Ok(json!({"id": index}))
+                    Ok(json!({"index": index , "docs": docs}))
                 },
                 Label::Doc((index, doc)) => {
                     manager.delete_doc(index.clone(), doc.clone())?;

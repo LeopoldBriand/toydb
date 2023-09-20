@@ -29,15 +29,15 @@ impl Manager {
         }
         Ok(())
     }
-    pub fn update_doc<T: Serialize>(&mut self, index_id: String, id: String, partial_data: T) -> Result<(), Box<dyn Error>> {
+    pub fn update_doc<T: Serialize>(&mut self, index_id: String, doc: String, partial_data: T) -> Result<(), Box<dyn Error>> {
         // Check index and doc
         match self.indices.get_mut(&index_id) {
             Some(index) => {
-                if !index.docs.contains_key(&id) { return Err(
+                if !index.docs.contains_key(&doc) { return Err(
                     FileManagerError::new("Doc doen't exist").into()
                 )}
                 // Open doc
-                let doc_path = Path::new(&index.path).join(&id);
+                let doc_path = Path::new(&index.path).join(&doc);
                 let mut doc_file = File::open(&doc_path)?;
                 let mut data: Value = serde_json::from_reader(&doc_file).expect("JSON was not well-formatted");
                 merge(&mut data, json!(partial_data));
