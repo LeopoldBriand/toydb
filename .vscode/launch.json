@@ -11,11 +11,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=db",
-                    "--package=db"
+                    "--bin=server",
+                    "--package=server"
                 ],
                 "filter": {
-                    "name": "db",
+                    "name": "server",
                     "kind": "bin"
                 }
             },
